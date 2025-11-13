@@ -1,0 +1,6 @@
+checkpoints/
+test_data/
+data/
+outputs/
+annotations/
+*.pt
