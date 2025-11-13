@@ -1,7 +1,10 @@
 checkpoints/
 test_data/
 data/
+data
 outputs/
+outputs
 annotations/
 *.pt
 */__pycache__/
+__pycache__/
