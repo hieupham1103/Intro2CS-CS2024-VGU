@@ -4,3 +4,4 @@ data/
 outputs/
 annotations/
 *.pt
+*/__pycache__/
