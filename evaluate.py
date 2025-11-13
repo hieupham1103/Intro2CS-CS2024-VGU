@@ -1,9 +1,3 @@
-"""
-Evaluation script for detection models on video data
-Supports both standard YOLO and multiscale models
-Calculates metrics: mAP@0.5, mAP@0.5:0.95, and FPS
-"""
-
 import argparse
 import cv2
 import numpy as np

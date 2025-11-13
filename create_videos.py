@@ -46,7 +46,6 @@ def group_images_by_sequence(image_dir):
 
 
 def read_label_file(label_path):
-    """Read YOLO format label file and return list of bounding boxes"""
     if not os.path.exists(label_path):
         return []
     
