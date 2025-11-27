@@ -16,10 +16,10 @@ def parse_args():
                         help='Path to the model checkpoint')
     parser.add_argument('--model-type', type=str, choices=['yolo', 'multiscale'], 
                         default='yolo', help='Type of model to evaluate (default: yolo)')
-    parser.add_argument('--iou-threshold', type=float, default=0.45,
-                        help='IoU threshold for NMS (default: 0.45)')
-    parser.add_argument('--conf-threshold', type=float, default=0.25,
-                        help='Confidence threshold for detection (default: 0.25)')
+    parser.add_argument('--iou-threshold', type=float, default=0.1,
+                        help='IoU threshold for NMS (default: 0.1)')
+    parser.add_argument('--conf-threshold', type=float, default=0.2,
+                        help='Confidence threshold for detection (default: 0.2)')
     parser.add_argument('--device', type=str, default='cuda',
                         help='Device to run inference on (cuda/cpu)')
     parser.add_argument('--video-type', type=str, choices=['RGB', 'IR'], 
@@ -31,6 +31,10 @@ def parse_args():
                         help='Scales for multiscale detection (only for multiscale model)')
     parser.add_argument('--crop-ratio', type=float, default=0.65,
                         help='Crop ratio for multiscale detection')
+    parser.add_argument('--ood-test', action='store_true',
+                        help='Evaluate on out-of-distribution test set (RGB_TEST_OD)')
+    parser.add_argument('--ood-dir', type=str, default='RGB_TEST_OD',
+                        help='Directory name for OOD test data (default: RGB_TEST_OD)')
     
     return parser.parse_args()
 
@@ -304,20 +308,32 @@ def main():
     
     # Setup paths
     data_root = Path(args.data_dir)
-    video_dir = data_root / f"{args.video_type}_video" / "videos" / "test"
-    label_dir = data_root / f"{args.video_type}_video" / "labels" / "test"
+    
+    # Choose between normal test set and OOD test set
+    if args.ood_test:
+        video_dir = data_root / args.ood_dir / "videos" / "test"
+        label_dir = data_root / args.ood_dir / "labels" / "test"
+        test_name = f"OOD ({args.ood_dir})"
+    else:
+        video_dir = data_root / f"{args.video_type}_video" / "videos" / "test"
+        label_dir = data_root / f"{args.video_type}_video" / "labels" / "test"
+        test_name = f"{args.video_type} Videos"
     
     if not video_dir.exists():
         print(f"Error: Video directory not found: {video_dir}")
+        if args.ood_test:
+            print(f"Hint: Run 'python reorganize_ood_data.py' first to prepare OOD test data.")
         return
     
     if not label_dir.exists():
         print(f"Error: Label directory not found: {label_dir}")
+        if args.ood_test:
+            print(f"Hint: Run 'python reorganize_ood_data.py' first to prepare OOD test data.")
         return
     
     # Print configuration
     print("="*80)
-    print(f"EVALUATION - {args.model_type.upper()} Model on {args.video_type} Videos")
+    print(f"EVALUATION - {args.model_type.upper()} Model on {test_name}")
     print("="*80)
     print(f"Model path:         {args.model_path}")
     print(f"Video directory:    {video_dir}")
@@ -459,7 +475,7 @@ def main():
     print("="*80)
     print(f"Model Type:      {args.model_type}")
     print(f"Model Path:      {args.model_path}")
-    print(f"Video Type:      {args.video_type}")
+    print(f"Test Set:        {test_name}")
     print(f"Videos Tested:   {len(video_files)}")
     print(f"Total Frames:    {frame_offset}")
     print(f"mAP@0.5:         {metrics['mAP50']:.4f}")
