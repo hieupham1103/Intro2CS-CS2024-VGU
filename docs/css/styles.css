@@ -161,6 +161,33 @@ nav a:hover {
     letter-spacing: 1px;
 }
 
+/* GitHub Button */
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding: 0.875rem 1.75rem;
+    background: #24292e;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+}
+
+.github-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.github-btn i {
+    font-size: 1.25rem;
+}
+
 section {
     padding: 5rem 2rem;
     max-width: 1200px;
@@ -642,6 +669,32 @@ footer p {
 footer .team {
     margin-bottom: 1rem;
     color: var(--text-primary);
+}
+
+.footer-links {
+    margin-bottom: 1.5rem;
+}
+
+.footer-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--primary);
+    color: var(--secondary);
+}
+
+.footer-links a i {
+    font-size: 1.1rem;
 }
 
 /* ========================================
