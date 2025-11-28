@@ -60,7 +60,7 @@ def parse_args():
                         default='multiscale', help='Type of second model (default: multiscale)')
     
     # Detection parameters
-    parser.add_argument('--conf-threshold', type=float, default=0.4,
+    parser.add_argument('--conf-threshold', type=float, default=0.3,
                         help='Confidence threshold for detection (default: 0.25)')
     parser.add_argument('--iou-threshold', type=float, default=0.45,
                         help='IoU threshold for NMS (default: 0.45)')
@@ -280,7 +280,7 @@ def load_model(model_path, model_type, conf_threshold, iou_threshold, device):
         from models.model import DetectionModel
         model = DetectionModel(
             model_path=model_path,
-            conf_threshold=0.6,
+            conf_threshold=0.7,
             iou_threshold=0.9,
             device=device
         )
@@ -328,7 +328,6 @@ def get_predictions(model, frame):
 def get_video_predictions(model, video_path, model_type='yolo'):
     """Get model predictions for entire video using video_detect for multiscale model"""
     if model_type == 'multiscale':
-        # Use video_detect for multiscale model (includes Kalman filter post-processing)
         print(f"  Running video_detect for {model_type} model...")
         all_frames_detections = model.video_detect(str(video_path))
     else:
