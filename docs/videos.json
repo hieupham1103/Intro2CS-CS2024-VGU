@@ -1,0 +1,156 @@
+[
+  {
+    "filename": "BIRD_00160_yolo_vs_multiscale.mp4",
+    "name": "BIRD_00160",
+    "category": "bird",
+    "type": "rgb",
+    "path": "videos/RGB/BIRD_00160_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_01271_yolo_vs_multiscale.mp4",
+    "name": "BIRD_01271",
+    "category": "bird",
+    "type": "rgb",
+    "path": "videos/RGB/BIRD_01271_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_02079_yolo_vs_multiscale.mp4",
+    "name": "BIRD_02079",
+    "category": "bird",
+    "type": "rgb",
+    "path": "videos/RGB/BIRD_02079_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_03291_yolo_vs_multiscale.mp4",
+    "name": "BIRD_03291",
+    "category": "bird",
+    "type": "rgb",
+    "path": "videos/RGB/BIRD_03291_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_006116_yolo_vs_multiscale.mp4",
+    "name": "DRONE_006116",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_006116_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_008118_yolo_vs_multiscale.mp4",
+    "name": "DRONE_008118",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_008118_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_014124_yolo_vs_multiscale.mp4",
+    "name": "DRONE_014124",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_014124_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_016126_yolo_vs_multiscale.mp4",
+    "name": "DRONE_016126",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_016126_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_037147_yolo_vs_multiscale.mp4",
+    "name": "DRONE_037147",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_037147_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_043153_yolo_vs_multiscale.mp4",
+    "name": "DRONE_043153",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_043153_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_069179_yolo_vs_multiscale.mp4",
+    "name": "DRONE_069179",
+    "category": "drone",
+    "type": "rgb",
+    "path": "videos/RGB/DRONE_069179_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_00160_yolo_vs_multiscale.mp4",
+    "name": "BIRD_00160",
+    "category": "bird",
+    "type": "ir",
+    "path": "videos/IR/BIRD_00160_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_01271_yolo_vs_multiscale.mp4",
+    "name": "BIRD_01271",
+    "category": "bird",
+    "type": "ir",
+    "path": "videos/IR/BIRD_01271_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_02079_yolo_vs_multiscale.mp4",
+    "name": "BIRD_02079",
+    "category": "bird",
+    "type": "ir",
+    "path": "videos/IR/BIRD_02079_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "BIRD_03291_yolo_vs_multiscale.mp4",
+    "name": "BIRD_03291",
+    "category": "bird",
+    "type": "ir",
+    "path": "videos/IR/BIRD_03291_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_006116_yolo_vs_multiscale.mp4",
+    "name": "DRONE_006116",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_006116_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_008118_yolo_vs_multiscale.mp4",
+    "name": "DRONE_008118",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_008118_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_014124_yolo_vs_multiscale.mp4",
+    "name": "DRONE_014124",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_014124_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_016126_yolo_vs_multiscale.mp4",
+    "name": "DRONE_016126",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_016126_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_037147_yolo_vs_multiscale.mp4",
+    "name": "DRONE_037147",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_037147_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_043153_yolo_vs_multiscale.mp4",
+    "name": "DRONE_043153",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_043153_yolo_vs_multiscale.mp4"
+  },
+  {
+    "filename": "DRONE_069179_yolo_vs_multiscale.mp4",
+    "name": "DRONE_069179",
+    "category": "drone",
+    "type": "ir",
+    "path": "videos/IR/DRONE_069179_yolo_vs_multiscale.mp4"
+  }
+]

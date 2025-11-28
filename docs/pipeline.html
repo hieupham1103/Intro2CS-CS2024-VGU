@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Detection Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #38bdf8; /* Sky Blue */
+            --accent-green: #4ade80; /* Green for success/inference */
+            --accent-purple: #c084fc; /* Purple for distillation */
+            --border: #334155;
+            --connector: #475569;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pipeline-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            gap: 60px;
+        }
+
+        h2.section-title {
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- TRAINING PHASE STYLES --- */
+        .training-flow {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            position: relative;
+            align-items: start;
+        }
+
+        .step-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .step-badge {
+            background: var(--accent-purple);
+            color: #000;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        /* Connectors (Arrows) */
+        .arrow-right {
+            position: absolute;
+            top: 50%;
+            right: -25px;
+            color: var(--connector);
+            font-size: 20px;
+            transform: translateY(-50%);
+        }
+
+        /* --- INFERENCE PHASE STYLES --- */
+        .inference-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px dashed var(--border);
+        }
+
+        .inf-node {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .inf-box {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-green);
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 600;
+            min-width: 140px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .inf-label {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .inf-arrow {
+            color: var(--accent-green);
+            font-size: 24px;
+        }
+
+        /* Specific Graphics */
+        .multiscale-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            width: 40px;
+            height: 30px;
+            border: 2px solid var(--text-sub);
+            margin: 0 auto 5px;
+            position: relative;
+        }
+        .multiscale-grid div { border: 1px dotted #555; }
+        .center-crop {
+            position: absolute;
+            width: 20px;
+            height: 15px;
+            border: 2px solid var(--accent);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(56, 189, 248, 0.2);
+        }
+
+        /* LEGEND */
+        .legend {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-sub);
+            display: flex;
+            gap: 15px;
+        }
+        .legend span { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .training-flow { grid-template-columns: 1fr; gap: 40px; }
+            .arrow-right { 
+                top: auto; 
+                bottom: -30px; 
+                right: 50%; 
+                transform: translateX(50%) rotate(90deg); 
+            }
+            .inference-flow { flex-direction: column; gap: 30px; }
+            .inf-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="pipeline-container">
+
+    <!-- SECTION 1: TRAINING STRATEGY -->
+    <div>
+        <h2 class="section-title"><i class="fa-solid fa-brain"></i> Phase 1: Training Pipeline</h2>
+        <div class="training-flow">
+            
+            <!-- Step 1: Pre-training -->
+            <div class="step-card">
+                <div class="step-badge" style="background: #fbbf24;">Step 1: Robust Init</div>
+                <div class="step-title">Transfer Learning</div>
+                <div class="step-desc">
+                    <strong>Source:</strong> DUT Anti-UAV Dataset (10k images)<br><br>
+                    Pre-training <strong>YOLOv8-n</strong> on a diverse dataset to learn general drone features (shape, motion) before seeing the target data.
+                </div>
+                <i class="fa-solid fa-arrow-right arrow-right"></i>
+            </div>
+
+            <!-- Step 2: Progressive Distillation -->
+            <div class="step-card">
+                <div class="step-badge">Step 2: Progressive KD</div>
+                <div class="step-title">Knowledge Distillation</div>
+                <div class="step-desc">
+                    <strong>Target:</strong> VIP Cup 2025 Dataset<br>
+                    <span style="color:var(--accent-purple)">YOLOv8-X <i class="fa-solid fa-arrow-right"></i> YOLOv8-L</span><br>
+                    <span style="color:var(--accent)">YOLOv8-L <i class="fa-solid fa-arrow-right"></i> YOLOv8-n</span><br><br>
+                    Using <strong>Intermediate Teacher (L)</strong> to bridge the capacity gap between X and Nano.
+                </div>
+                <i class="fa-solid fa-arrow-right arrow-right"></i>
+            </div>
+
+            <!-- Step 3: Domain Invariance -->
+            <div class="step-card">
+                <div class="step-badge" style="background: #f472b6;">Step 3: Feature Loss</div>
+                <div class="step-title">Domain Invariance</div>
+                <div class="step-desc">
+                    Applying <strong>FFT (Fast Fourier Transform)</strong> during distillation.<br><br>
+                    Focusing on transferring the <strong>Phase Spectrum</strong> (Structure) while ignoring the Amplitude Spectrum (Style/Weather) to handle Fog/Night scenes.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECTION 2: INFERENCE STRATEGY -->
+    <div>
+        <h2 class="section-title" style="color: var(--accent-green); border-color: var(--accent-green);"><i class="fa-solid fa-bolt"></i> Phase 2: Inference Pipeline</h2>
+        <div class="inference-flow">
+            
+            <div class="inf-node">
+                <div class="inf-box" style="border-color: #fff;">Input Frame</div>
+                <div class="inf-label">Raw RGB/IR Image</div>
+            </div>
+
+            <i class="fa-solid fa-arrow-right inf-arrow"></i>
+
+            <div class="inf-node">
+                <div class="inf-box">
+                    <div class="multiscale-grid">
+                        <div></div><div></div><div></div><div></div>
+                        <div class="center-crop"></div>
+                    </div>
+                    5-Crop Split
+                </div>
+                <div class="inf-label">4 Corners + 1 Center<br>(Zoom Effect)</div>
+            </div>
+
+            <i class="fa-solid fa-arrow-right inf-arrow"></i>
+
+            <div class="inf-node">
+                <div class="inf-box">YOLOv8-n</div>
+                <div class="inf-label">Distilled Model<br>(Batch Inference)</div>
+            </div>
+
+            <i class="fa-solid fa-arrow-right inf-arrow"></i>
+
+            <div class="inf-node">
+                <div class="inf-box">NMW</div>
+                <div class="inf-label">Non-Maximum Weighted<br>(Fusion)</div>
+            </div>
+
+            <i class="fa-solid fa-arrow-right inf-arrow"></i>
+
+            <div class="inf-node">
+                <div class="inf-box" style="background: var(--accent-green); color: #000;">Result</div>
+                <div class="inf-label">Final Bounding Box</div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

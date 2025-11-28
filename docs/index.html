@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Detection System</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-drone"></i> UAV Detection
+            </div>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#challenges">Challenges</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#pipeline">Pipeline</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#demos">Demos</a></li>
+                <li><a href="#references">References</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <span class="badge"><i class="fas fa-trophy"></i> A Robust Real-time UAV Detection System</span>
+            <h1>A Robust Real-time UAV Detection System</h1>
+            <p class="subtitle">
+                Multiscale Processing & Domain-Invariant Knowledge Distillation for detecting small UAVs in challenging environments using YOLOv8-based architecture.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-value">0.84</div>
+                    <div class="stat-label">mAP@0.5</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">FPS</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">+29%</div>
+                    <div class="stat-label">Improvement</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Abstract -->
+    <section id="abstract">
+        <div class="section-header">
+            <h2>Abstract</h2>
+        </div>
+        <div class="card" style="max-width: 900px; margin: 0 auto;">
+            <p>
+                The proliferation of small Unmanned Aerial Vehicles (UAVs) poses significant security challenges to critical infrastructure. Detecting these small targets in real-time on edge devices is difficult due to their low radar cross-sections and complex environmental backgrounds. This report presents a computer vision system designed to address these challenges using a <strong>YOLOv8-based architecture</strong>. The system is enhanced by two key strategies: (1) <strong>Multiscale Processing</strong> using a 5-crop inference mechanism with Non-Maximum Weighted (NMW) fusion to simulate a zoom effect without interpolation loss; and (2) <strong>Domain-Invariant Progressive Knowledge Distillation</strong> to transfer robust features from a large Teacher model to a lightweight Student model.
+            </p>
+        </div>
+    </section>
+
+    <!-- Challenges Section -->
+    <section id="challenges">
+        <div class="section-header">
+            <h2>Core Technical Challenges</h2>
+            <p>As commercial drones become more accessible, the risk of unauthorized surveillance and airspace intrusion increases.</p>
+        </div>
+        <div class="grid-3">
+            <div class="card">
+                <div class="challenge-icon orange">
+                    <i class="fas fa-search-minus"></i>
+                </div>
+                <h3>Small Object Size</h3>
+                <p>Drones often occupy a tiny fraction of the frame (&lt;5%), and standard resizing in object detectors causes significant feature loss.</p>
+            </div>
+            <div class="card">
+                <div class="challenge-icon blue">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <h3>Computational Cost</h3>
+                <p>High-accuracy models (e.g., YOLOv8-X) are too heavy for edge devices, requiring the speed of 'Nano' models with the accuracy of 'Large' models.</p>
+            </div>
+            <div class="card">
+                <div class="challenge-icon purple">
+                    <i class="fas fa-cloud-sun"></i>
+                </div>
+                <h3>Domain Generalization</h3>
+                <p>The system must generalize across diverse environments including clear sky, fog, night, and various weather conditions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section id="methodology">
+        <div class="section-header">
+            <h2>Methodology</h2>
+            <p>Our approach combines two powerful strategies to achieve high accuracy with real-time performance.</p>
+        </div>
+        <div class="methodology-content">
+            <div class="method-card">
+                <h3><i class="fas fa-th-large"></i> Multiscale Processing</h3>
+                <p>To resolve the small object issue, we implemented a grid cropping strategy during inference. Instead of resizing the entire large image down to the model input size (which destroys small details), we process the image in segments.</p>
+                
+                <h4>5-Crop Pattern</h4>
+                <ul>
+                    <li>Image is divided into 4 crops from corners and 1 from center</li>
+                    <li>Each crop covers approximately 55-65% of the original frame</li>
+                    <li>Crops are fed at input size (320×256) creating a "zoom" effect</li>
+                </ul>
+
+                <h4>NMW Fusion</h4>
+                <p>Merging results using standard NMS proved too aggressive. We adopted Non-Maximum Weighted (NMW) to calculate weighted average of box coordinates based on confidence scores.</p>
+
+                <div class="highlight-box">
+                    <p><strong>Key Finding:</strong> Using only the 5 crops (discarding the full-frame original image) yielded the best F1-score and AP, as the original resized frame often introduced false positives.</p>
+                </div>
+            </div>
+
+            <div class="method-card">
+                <h3><i class="fas fa-graduation-cap"></i> Knowledge Distillation</h3>
+                <p>To achieve low latency, we distilled knowledge from a heavy Teacher model to a lightweight Student model (YOLOv8-Nano).</p>
+
+                <h4>Progressive Distillation</h4>
+                <p>Directly distilling from a massive model to a tiny one often causes "Knowledge Shock" due to the capacity gap. We employed a progressive pipeline:</p>
+                
+                <div class="pipeline">
+                    <span class="pipeline-step">Teacher (v8-X)</span>
+                    <span class="pipeline-arrow">→</span>
+                    <span class="pipeline-step">Intermediate (v8-L)</span>
+                    <span class="pipeline-arrow">→</span>
+                    <span class="pipeline-step">Student (v8-Nano)</span>
+                </div>
+
+                <h4>Domain-Invariant Features (FFT)</h4>
+                <p>To handle domain shifts (sunny vs. foggy), we use Fast Fourier Transform to decompose feature maps:</p>
+                <ul>
+                    <li><strong>Amplitude Spectrum:</strong> Low-level style info (illumination, weather)</li>
+                    <li><strong>Phase Spectrum:</strong> High-level structural info (shapes)</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p>By prioritizing Phase Spectrum consistency in the distillation loss, we forced the Student to learn structural features invariant to environmental changes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Section -->
+    <section class="pipeline-section" id="pipeline">
+        <div class="pipeline-container">
+            <!-- Training Phase -->
+            <div>
+                <h3 class="pipeline-phase-title">
+                    <i class="fas fa-brain"></i> Phase 1: Training Pipeline
+                </h3>
+                <div class="training-flow">
+                    <!-- Step 1: Pre-training -->
+                    <div class="step-card">
+                        <div class="step-badge init">Step 1: Robust Init</div>
+                        <div class="step-title">Transfer Learning</div>
+                        <div class="step-desc">
+                            <strong>Source:</strong> DUT Anti-UAV Dataset (10k images)<br><br>
+                            Pre-training <strong>YOLOv8</strong> on a diverse dataset to learn general drone features (shape, motion) before seeing the target data.
+                        </div>
+                        <i class="fas fa-arrow-right arrow-right"></i>
+                    </div>
+
+                    <!-- Step 2: Progressive Distillation -->
+                    <div class="step-card">
+                        <div class="step-badge">Step 2: Progressive KD</div>
+                        <div class="step-title">Knowledge Distillation</div>
+                        <div class="step-desc">
+                            <strong>Target:</strong> VIP Cup 2025 Dataset<br>
+                            <span style="color: #c084fc;">YOLOv8-X <i class="fas fa-arrow-right"></i> YOLOv8-L</span><br>
+                            <span style="color: var(--secondary);">YOLOv8-L <i class="fas fa-arrow-right"></i> YOLOv8-n</span><br><br>
+                            Using <strong>Intermediate Teacher (L)</strong> to bridge the capacity gap between X and Nano.
+                        </div>
+                        <i class="fas fa-arrow-right arrow-right"></i>
+                    </div>
+
+                    <!-- Step 3: Domain Invariance -->
+                    <div class="step-card">
+                        <div class="step-badge feature">Step 3: Feature Loss</div>
+                        <div class="step-title">Domain Invariance</div>
+                        <div class="step-desc">
+                            Applying <strong>FFT (Fast Fourier Transform)</strong> during distillation.<br><br>
+                            Focusing on transferring the <strong>Phase Spectrum</strong> (Structure) while ignoring the Amplitude Spectrum (Style/Weather) to handle Fog/Night scenes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inference Phase -->
+            <div>
+                <h3 class="pipeline-phase-title inference">
+                    <i class="fas fa-bolt"></i> Phase 2: Inference Pipeline
+                </h3>
+                <div class="inference-flow">
+                    <div class="inf-node">
+                        <div class="inf-box input">Input Frame</div>
+                        <div class="inf-label">Raw RGB/IR Image</div>
+                    </div>
+
+                    <i class="fas fa-arrow-right inf-arrow"></i>
+
+                    <div class="inf-node">
+                        <div class="inf-box">
+                            <div class="multiscale-grid">
+                                <div></div><div></div><div></div><div></div>
+                                <div class="center-crop"></div>
+                            </div>
+                            5-Crop Split
+                        </div>
+                        <div class="inf-label">4 Corners + 1 Center<br>(Zoom Effect)</div>
+                    </div>
+
+                    <i class="fas fa-arrow-right inf-arrow"></i>
+
+                    <div class="inf-node">
+                        <div class="inf-box">YOLOv8-n</div>
+                        <div class="inf-label">Distilled Model<br>(Batch Inference)</div>
+                    </div>
+
+                    <i class="fas fa-arrow-right inf-arrow"></i>
+
+                    <div class="inf-node">
+                        <div class="inf-box">NMW</div>
+                        <div class="inf-label">Non-Maximum Weighted<br>(Fusion)</div>
+                    </div>
+
+                    <i class="fas fa-arrow-right inf-arrow"></i>
+
+                    <div class="inf-node">
+                        <div class="inf-box result">Result</div>
+                        <div class="inf-label">Final Bounding Box</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results">
+        <div class="section-header">
+            <h2>Experimental Results</h2>
+            <p>Evaluated on VIP Cup 2025 and DUT Anti-UAV datasets</p>
+        </div>
+
+        <div class="card" style="max-width: 900px; margin: 0 auto;">
+            <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-chart-bar" style="color: var(--primary); margin-right: 0.5rem;"></i> Quantitative Results</h3>
+            <div class="results-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Configuration</th>
+                            <th>mAP@0.5</th>
+                            <th>mAP@0.5-0.9</th>
+                            <th>FPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>YOLOv11-Nano</td>
+                            <td>0.51</td>
+                            <td>0.23</td>
+                            <td>72</td>
+                        </tr>
+                        <tr>
+                            <td>YOLOv12-Nano</td>
+                            <td>0.55</td>
+                            <td>0.22</td>
+                            <td>69</td>
+                        </tr>
+                        <tr>
+                            <td>YOLOv8-Nano (Baseline)</td>
+                            <td>0.55</td>
+                            <td>0.22</td>
+                            <td>77</td>
+                        </tr>
+                        <tr>
+                            <td>YOLOv8-Nano (KD)</td>
+                            <td>0.65</td>
+                            <td>0.25</td>
+                            <td>77</td>
+                        </tr>
+                        <tr>
+                            <td>YOLOv8-Nano (Pretrained)</td>
+                            <td>0.79</td>
+                            <td>0.48</td>
+                            <td>77</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>YOLOv8-Nano (KD + Pretrained + Multiscale)</td>
+                            <td class="metric-good">0.84</td>
+                            <td class="metric-good">0.51</td>
+                            <td>28</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 style="margin-top: 2rem; color: var(--secondary);">Multiscale Analysis</h4>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                Experiments on the cropping strategy revealed that including the original full-frame image often degraded Precision (AP).
+            </p>
+            <ul style="color: var(--text-secondary); margin-top: 1rem; padding-left: 1.5rem;">
+                <li><strong>Original + 4 Crops:</strong> Higher Recall, but lower Precision (more false positives)</li>
+                <li><strong>5 Crops Only:</strong> Best trade-off, achieving F1-score of <span class="metric-good">0.3323</span> vs baseline 0.2978</li>
+            </ul>
+            <h4 style="margin-top: 2rem; color: var(--secondary);">Knowledge Distillation</h4>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                We distilled knowledge from YOLOv8-X to YOLOv8-Nano via YOLOv8-Large as an intermediate. Incorporating FFT-based domain-invariant features significantly boosted mAP by +10%.
+            </p>
+        </div>
+    </section>
+
+    <!-- Video Demos Section -->
+    <section class="video-section" id="demos">
+        <div class="section-header">
+            <h2>Detection Demos</h2>
+            <p>Visual comparison of our detection system on RGB and IR (Infrared) videos</p>
+        </div>
+
+        <div class="video-tabs">
+            <button class="tab-btn active" onclick="filterVideos('all')">All Videos</button>
+            <button class="tab-btn" onclick="filterVideos('rgb')">RGB Videos</button>
+            <button class="tab-btn" onclick="filterVideos('ir')">IR Videos</button>
+            <button class="tab-btn" onclick="filterVideos('drone')">Drones</button>
+            <button class="tab-btn" onclick="filterVideos('bird')">Birds</button>
+        </div>
+
+        <div class="video-grid" id="videoGrid">
+            <!-- Videos will be loaded dynamically from videos.json -->
+            <div class="loading-message" style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                Loading videos...
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section id="conclusion">
+        <div class="conclusion">
+            <h2>Conclusion</h2>
+            <p>
+                This project successfully developed a UAV detection system that balances accuracy and speed. The <strong>Multiscale Processing</strong> strategy effectively handles small objects by simulating a zoom effect, while the <strong>Progressive Knowledge Distillation</strong> with FFT ensures the lightweight model is robust against environmental noise.
+            </p>
+            <div class="key-achievements">
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h4>+29% Accuracy</h4>
+                    <p>mAP improved from 0.55 to 0.84</p>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Real-time Speed</h4>
+                    <p>28 FPS suitable for edge deployment</p>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Domain Robust</h4>
+                    <p>Works across diverse environments</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- References Section -->
+    <section class="references-section" id="references">
+        <div class="references-container">
+            <div class="section-header">
+                <h2>References</h2>
+                <p>Key research papers that informed our approach</p>
+            </div>
+
+            <div class="reference-item">
+                <span class="reference-number">1</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.1109/ICASSP49357.2023.10095516" target="_blank" class="reference-title">
+                        High-Speed Drone Detection Based On Yolo-V8
+                    </a>
+                    <div class="reference-authors">Jun-Hwa Kim, Namho Kim, Chee Sun Won</div>
+                    <div class="reference-venue">ICASSP 2023 - IEEE International Conference on Acoustics, Speech and Signal Processing <span class="reference-year">(2023)</span></div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <span class="reference-number">2</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.48550/arXiv.2205.10851" target="_blank" class="reference-title">
+                        Vision-based Anti-UAV Detection and Tracking
+                    </a>
+                    <div class="reference-authors">Jie Zhao, Jingshu Zhang, Dongdong Li, Dong Wang</div>
+                    <div class="reference-venue">IEEE Transactions on Intelligent Transportation Systems <span class="reference-year">(2022)</span></div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <span class="reference-number">3</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.48550/arXiv.2105.11120" target="_blank" class="reference-title">
+                        A Fourier-based Framework for Domain Generalization
+                    </a>
+                    <div class="reference-authors">Qinwei Xu, Ruipeng Zhang, Ya Zhang, Yanfeng Wang, Qi Tian</div>
+                    <div class="reference-venue">2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) <span class="reference-year">(2021)</span></div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <span class="reference-number">4</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.48550/arXiv.2504.19347" target="_blank" class="reference-title">
+                        Improving Small Drone Detection Through Multi-Scale Processing and Data Augmentation
+                    </a>
+                    <div class="reference-authors">Rayson Laroca, Marcelo dos Santos, David Menotti</div>
+                    <div class="reference-venue">International Joint Conference on Neural Networks (IJCNN) <span class="reference-year">(2025)</span></div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <span class="reference-number">5</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.48550/arXiv.2408.11407" target="_blank" class="reference-title">
+                        Domain-invariant Progressive Knowledge Distillation for UAV-based Object Detection
+                    </a>
+                    <div class="reference-authors">Liang Yao, Fan Liu, Chuanyi Zhang, Zhiquan Ou, Ting Wu</div>
+                    <div class="reference-venue">IEEE Geoscience and Remote Sensing Letters <span class="reference-year">(2024)</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="team"><strong>Pham Dinh Trung Hieu, Truong Quoc Phong, Pham Minh Thu, Nguyen Hoang Minh, Nguyen Khanh Trang</strong></p>
+        <p>Introduction to Computer Science - VGU</p>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <div class="scroll-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html>
