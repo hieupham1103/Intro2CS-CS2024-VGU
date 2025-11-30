@@ -61,7 +61,7 @@ function createVideoCard(video) {
             </div>
         </div>
     `;
-    
+        
     return card;
 }
 
@@ -78,7 +78,7 @@ function filterVideos(filter) {
     event.target.classList.add('active');
     
     cards.forEach(card => {
-        const types = card.getAttribute('data-type');
+        const types = card.getAttribute('data-type').split(' ');
         if (filter === 'all' || types.includes(filter)) {
             card.style.display = 'block';
         } else {
