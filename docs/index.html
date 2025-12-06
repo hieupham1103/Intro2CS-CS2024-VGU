@@ -40,7 +40,7 @@
             <span class="badge"><i class="fas fa-trophy"></i> A Robust Real-time UAV Detection System</span>
             <h1>A Robust Real-time UAV Detection System</h1>
             <p class="subtitle">
-                Multiscale Processing & Domain-Invariant Knowledge Distillation for detecting small UAVs in challenging environments using YOLOv8-based architecture.
+                Multiscale Processing & Cross-Head Knowledge Distillation for detecting small UAVs in challenging environments using YOLOv8-based architecture.
             </p>
             <div class="hero-stats">
                 <div class="stat">
@@ -69,7 +69,7 @@
         </div>
         <div class="card" style="max-width: 900px; margin: 0 auto;">
             <p>
-                The proliferation of small Unmanned Aerial Vehicles (UAVs) poses significant security challenges to critical infrastructure. Detecting these small targets in real-time on edge devices is difficult due to their low radar cross-sections and complex environmental backgrounds. This report presents a computer vision system designed to address these challenges using a <strong>YOLOv8-based architecture</strong>. The system is enhanced by two key strategies: (1) <strong>Multiscale Processing</strong> using a 5-crop inference mechanism with Non-Maximum Weighted (NMW) fusion to simulate a zoom effect without interpolation loss; and (2) <strong>Domain-Invariant Progressive Knowledge Distillation</strong> to transfer robust features from a large Teacher model to a lightweight Student model.
+                The proliferation of small Unmanned Aerial Vehicles (UAVs) poses significant security challenges to critical infrastructure. Detecting these small targets in real-time on edge devices is difficult due to their low radar cross-sections and complex environmental backgrounds. This report presents a computer vision system designed to address these challenges using a <strong>YOLOv8-based architecture</strong>. The system is enhanced by two key strategies: (1) <strong>Multiscale Processing</strong> using a 5-crop inference mechanism with Non-Maximum Weighted (NMW) fusion to simulate a zoom effect without interpolation loss; and (2) <strong>Cross-Head Knowledge Distillation (CrossKD)</strong> combined with Progressive KD to efficiently transfer detection-sensitive features from a large Teacher model to a lightweight Student model.
             </p>
         </div>
     </section>
@@ -133,7 +133,7 @@
 
             <div class="method-card">
                 <h3><i class="fas fa-graduation-cap"></i> Knowledge Distillation</h3>
-                <p>To achieve low latency, we distilled knowledge from a heavy Teacher model to a lightweight Student model (YOLOv8-Nano).</p>
+                <p>To achieve low latency, we distilled knowledge from a heavy Teacher model to a lightweight Student model (YOLOv8-Nano) using Cross-Head Knowledge Distillation (CrossKD).</p>
 
                 <h4>Progressive Distillation</h4>
                 <p>Directly distilling from a massive model to a tiny one often causes "Knowledge Shock" due to the capacity gap. We employed a progressive pipeline:</p>
@@ -146,15 +146,15 @@
                     <span class="pipeline-step">Student (v8-Nano)</span>
                 </div>
 
-                <h4>Domain-Invariant Features (FFT)</h4>
-                <p>To handle domain shifts (sunny vs. foggy), we use Fast Fourier Transform to decompose feature maps:</p>
+                <h4>Cross-Head Knowledge Distillation (CrossKD)</h4>
+                <p>Instead of traditional feature mimicking, CrossKD establishes cross-connections between Teacher and Student detection heads:</p>
                 <ul>
-                    <li><strong>Amplitude Spectrum:</strong> Low-level style info (illumination, weather)</li>
-                    <li><strong>Phase Spectrum:</strong> High-level structural info (shapes)</li>
+                    <li><strong>Student Features → Teacher Head:</strong> Forces the Student's backbone to learn features robust enough for the Teacher's powerful detection head</li>
+                    <li><strong>Teacher Features → Student Head:</strong> Trains the Student's head to process high-quality, complex features from the Teacher</li>
                 </ul>
 
                 <div class="highlight-box">
-                    <p>By prioritizing Phase Spectrum consistency in the distillation loss, we forced the Student to learn structural features invariant to environmental changes.</p>
+                    <p><strong>Why CrossKD?</strong> By interacting directly at the head level, the model learns better bounding box regression and focuses on detection-sensitive features rather than background noise.</p>
                 </div>
             </div>
         </div>
@@ -162,6 +162,12 @@
 
     <!-- Pipeline Section -->
     <section class="pipeline-section" id="pipeline">
+        <div class="section-header">
+            <h2>System Pipeline</h2>
+            <p>Overview of our training and inference architecture</p>
+        </div>
+        
+
         <div class="pipeline-container">
             <!-- Training Phase -->
             <div>
@@ -193,13 +199,13 @@
                         <i class="fas fa-arrow-right arrow-right"></i>
                     </div>
 
-                    <!-- Step 3: Domain Invariance -->
+                    <!-- Step 3: CrossKD -->
                     <div class="step-card">
-                        <div class="step-badge feature">Step 3: Feature Loss</div>
-                        <div class="step-title">Domain Invariance</div>
+                        <div class="step-badge feature">Step 3: CrossKD Loss</div>
+                        <div class="step-title">Cross-Head Distillation</div>
                         <div class="step-desc">
-                            Applying <strong>FFT (Fast Fourier Transform)</strong> during distillation.<br><br>
-                            Focusing on transferring the <strong>Phase Spectrum</strong> (Structure) while ignoring the Amplitude Spectrum (Style/Weather) to handle Fog/Night scenes.
+                            Applying <strong>Cross-Head Knowledge Distillation</strong> during training.<br><br>
+                            Cross-connecting <strong>Student backbone → Teacher head</strong> and <strong>Teacher backbone → Student head</strong> for detection-sensitive feature transfer.
                         </div>
                     </div>
                 </div>
@@ -252,7 +258,13 @@
                 </div>
             </div>
         </div>
+        
     </section>
+    
+    <!-- Pipeline Image -->
+    <div style="max-width: 1000px; margin: 0 auto 3rem auto; padding: 0 2rem;">
+        <img src="images/pipeline.png" alt="Distillation Pipeline" style="width: 100%; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);">
+    </div>
 
     <!-- Results Section -->
     <section id="results">
@@ -330,7 +342,7 @@
             </ul>
             <h4 style="margin-top: 2rem; color: var(--secondary);">Knowledge Distillation</h4>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">
-                We distilled knowledge from YOLOv8-X to YOLOv8-Nano via YOLOv8-Large as an intermediate. Incorporating FFT-based domain-invariant features significantly boosted mAP by +10%.
+                We distilled knowledge from YOLOv8-X to YOLOv8-Nano via YOLOv8-Large as an intermediate using Cross-Head Knowledge Distillation (CrossKD). This method significantly boosted mAP by +10% by focusing on detection-sensitive features and improving localization.
             </p>
         </div>
     </section>
@@ -364,7 +376,7 @@
         <div class="conclusion">
             <h2>Conclusion</h2>
             <p>
-                This project successfully developed a UAV detection system that balances accuracy and speed. The <strong>Multiscale Processing</strong> strategy effectively handles small objects by simulating a zoom effect, while the <strong>Progressive Knowledge Distillation</strong> with FFT ensures the lightweight model is robust against environmental noise.
+                This project successfully developed a UAV detection system that balances accuracy and speed. The <strong>Multiscale Processing</strong> strategy effectively handles small objects by simulating a zoom effect, while the <strong>Cross-Head Knowledge Distillation (CrossKD)</strong> combined with Progressive KD ensures efficient knowledge transfer with enhanced localization capabilities.
             </p>
             <div class="key-achievements">
                 <div class="achievement">
@@ -383,10 +395,10 @@
                 </div>
                 <div class="achievement">
                     <div class="achievement-icon">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-crosshairs"></i>
                     </div>
-                    <h4>Domain Robust</h4>
-                    <p>Works across diverse environments</p>
+                    <h4>Enhanced Localization</h4>
+                    <p>Better bounding box regression via CrossKD</p>
                 </div>
             </div>
         </div>
@@ -452,6 +464,18 @@
                     </a>
                     <div class="reference-authors">Liang Yao, Fan Liu, Chuanyi Zhang, Zhiquan Ou, Ting Wu</div>
                     <div class="reference-venue">IEEE Geoscience and Remote Sensing Letters <span class="reference-year">(2024)</span></div>
+                </div>
+            </div>
+
+            
+            <div class="reference-item">
+                <span class="reference-number">6</span>
+                <div class="reference-content">
+                    <a href="https://doi.org/10.48550/arXiv.2306.11369" target="_blank" class="reference-title">
+                       CrossKD: Cross-Head Knowledge Distillation for Object Detection
+                    </a>
+                    <div class="reference-authors">Jiabao Wang, Yuming Chen, Zhaohui Zheng, Xiang Li, Ming-Ming Cheng, Qibin Hou</div>
+                    <div class="reference-venue">2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) <span class="reference-year">(2024)</span></div>
                 </div>
             </div>
         </div>
