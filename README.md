@@ -333,9 +333,9 @@ YOLOv8-X (Teacher) → YOLOv8-L (Intermediate) → YOLOv8-Nano (Student)
 |--------|---------------|
 | **Pham Dinh Trung Hieu** | Implemented multiscale inference pipeline, applied Cross-Head Knowledge Distillation (CrossKD), created presentation slides and website |
 | **Truong Quoc Phong** | Dataset preprocessing, trained and evaluated YOLOv8-P2 model, contributed to slides and website |
-| **Pham Minh Thu** | Trained and evaluated YOLOv8 models |
-| **Nguyen Hoang Minh** | Trained and evaluated YOLOv11 models |
-| **Nguyen Khanh Trang** | Trained and evaluated YOLOv8 models |
+| **Pham Minh Thu** | Trained and evaluated YOLOv7 and YOLOv8 models |
+| **Nguyen Hoang Minh** | Trained and evaluated YOLOv10 and YOLOv11 models |
+| **Nguyen Khanh Trang** | Trained and evaluated YOLOv8 and YOLOv9 models |
 
 ## License
 
