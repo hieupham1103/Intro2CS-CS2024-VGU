@@ -234,11 +234,51 @@ For detailed CrossKD documentation, see [CrossKD/README.md](CrossKD/README.md).
 
 ### 3. Evaluation
 
-Use `evaluate.py` to evaluate trained models:
+Use `evaluate.py` to evaluate trained models on video datasets.
 
+**Basic Usage:**
 ```bash
-python evaluate.py --model checkpoints/rgb.pt --set RGB
+# Evaluate on RGB videos
+python evaluate.py --model-path yolov8n_p2.pt --video-type RGB
+
+# Evaluate on IR (Infrared) videos
+python evaluate.py --model-path yolov8n_p2.pt --video-type IR
 ```
+
+**Advanced Options:**
+```bash
+python evaluate.py --model-path yolov8n_p2.pt \
+    --model-type multiscale \
+    --video-type RGB \
+    --data-dir data/ \
+    --conf-threshold 0.2 \
+    --iou-threshold 0.1 \
+    --scales 1.0 \
+    --crop-ratio 0.65 \
+    --device cuda
+```
+
+**Arguments:**
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `--model-path` | Path to model checkpoint | Required |
+| `--model-type` | Model type (`yolo` or `multiscale`) | `yolo` |
+| `--video-type` | Video type (`RGB` or `IR`) | `RGB` |
+| `--data-dir` | Path to dataset root directory | `data/` |
+| `--conf-threshold` | Confidence threshold for detection | `0.2` |
+| `--iou-threshold` | IoU threshold for NMS | `0.1` |
+| `--scales` | Scales for multiscale detection | `[1.0]` |
+| `--crop-ratio` | Crop ratio for multiscale detection | `0.65` |
+| `--device` | Device to run inference on | `cuda` |
+| `--ood-test` | Evaluate on out-of-distribution test set | False |
+| `--ood-dir` | Directory name for OOD test data | `RGB_TEST_OD` |
+
+**Output Metrics:**
+- mAP@0.5: Mean Average Precision at IoU threshold 0.5
+- mAP@0.5:0.95: Mean Average Precision averaged over IoU thresholds from 0.5 to 0.95
+- FPS: Frames per second inference speed
+- Per-class AP for bird and drone classes
+
 
 ### 4. Visualization
 
