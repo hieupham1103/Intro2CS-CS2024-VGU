@@ -8,6 +8,7 @@ import time
 
 from models import multiscale_model as multiscale
 from models import model as yolo_model
+from models.denoiser import create_denoiser, VideoDenoiser
 
 
 def parse_args():
@@ -35,6 +36,15 @@ def parse_args():
                         help='Evaluate on out-of-distribution test set (RGB_TEST_OD)')
     parser.add_argument('--ood-dir', type=str, default='RGB_TEST_OD',
                         help='Directory name for OOD test data (default: RGB_TEST_OD)')
+    
+    # Denoising arguments
+    parser.add_argument('--denoise', action='store_true',
+                        help='Apply Neighbor2Neighbor denoising before detection')
+    parser.add_argument('--noise-type', type=str, default='gauss25',
+                        choices=['gauss25', 'gauss5_50', 'poisson30', 'poisson5_50'],
+                        help='Noise model for denoiser (default: gauss25)')
+    parser.add_argument('--denoiser-model', type=str, default=None,
+                        help='Path to denoiser model weights (optional, uses default if not specified)')
     
     return parser.parse_args()
 
@@ -153,6 +163,78 @@ def calculate_ap(precisions, recalls):
             p = np.max(precisions[recalls >= t])
         ap += p / 11.0
     return ap
+
+
+def video_detect_with_denoising(
+    detection_model, 
+    video_path, 
+    denoiser=None, 
+    model_type='yolo',
+    scales=[1.0],
+    crop_ratio=0.65,
+    conf_threshold=0.2,
+    iou_threshold=0.1
+):
+    """
+    Process video with optional denoising before detection.
+    
+    Args:
+        detection_model: Detection model (yolo or multiscale)
+        video_path: Path to video file
+        denoiser: Optional VideoDenoiser instance
+        model_type: 'yolo' or 'multiscale'
+        scales: Scales for multiscale detection
+        crop_ratio: Crop ratio for multiscale detection
+        conf_threshold: Confidence threshold
+        iou_threshold: IoU threshold
+    
+    Returns:
+        List of detection dicts for each frame
+    """
+    frames = []
+    cap = cv2.VideoCapture(str(video_path))
+    
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Apply denoising if enabled
+        if denoiser is not None:
+            frame = denoiser.denoise_frame(frame)
+            # Ensure frame is uint8 for detection model
+            frame = np.clip(frame, 0, 255).astype(np.uint8)
+        
+        # Run detection
+        if model_type == 'multiscale':
+            det = detection_model.image_detect(
+                frame,
+                scales=scales,
+                crop_ratio=crop_ratio,
+                conf_threshold=conf_threshold,
+                iou_threshold=iou_threshold
+            )
+        else:
+            det = detection_model.image_detect(
+                frame,
+                conf_threshold=conf_threshold,
+                iou_threshold=iou_threshold
+            )
+        
+        frames.append(det)
+    
+    cap.release()
+    
+    # Apply post-processing for multiscale model
+    if model_type == 'multiscale' and hasattr(detection_model, '_postprocess_frames'):
+        frames = detection_model._postprocess_frames(
+            frames, 
+            min_detection_frames=4, 
+            max_missing_frames=5, 
+            iou_threshold=iou_threshold
+        )
+    
+    return frames
 
 
 def evaluate_video(predictions, ground_truths, iou_threshold=0.5, num_classes=2):
@@ -345,7 +427,29 @@ def main():
     if args.model_type == 'multiscale':
         print(f"Scales:             {args.scales}")
         print(f"Crop ratio:         {args.crop_ratio}")
+    if args.denoise:
+        print(f"Denoising:          ENABLED ({args.noise_type})")
+        if args.denoiser_model:
+            print(f"Denoiser model:     {args.denoiser_model}")
+    else:
+        print(f"Denoising:          DISABLED")
     print("="*80)
+    
+    # Initialize denoiser if requested
+    denoiser = None
+    if args.denoise:
+        print(f"\nInitializing Neighbor2Neighbor denoiser ({args.noise_type})...")
+        try:
+            denoiser = create_denoiser(
+                video_type=args.video_type,
+                noise_type=args.noise_type,
+                model_path=args.denoiser_model,
+                device=args.device
+            )
+        except Exception as e:
+            print(f"Warning: Failed to initialize denoiser: {e}")
+            print("Continuing without denoising...")
+            denoiser = None
     
     # Load model
     print(f"\nLoading {args.model_type} model from {args.model_path}...")
@@ -403,7 +507,19 @@ def main():
         # Run detection on video with timing
         start_time = time.time()
         
-        if args.model_type == 'multiscale':
+        # Use denoising-aware processing if denoiser is available
+        if denoiser is not None:
+            video_detections = video_detect_with_denoising(
+                detection_model,
+                str(video_path),
+                denoiser=denoiser,
+                model_type=args.model_type,
+                scales=args.scales if args.model_type == 'multiscale' else [1.0],
+                crop_ratio=args.crop_ratio,
+                conf_threshold=args.conf_threshold,
+                iou_threshold=args.iou_threshold
+            )
+        elif args.model_type == 'multiscale':
             video_detections = detection_model.video_detect(
                 str(video_path),
                 scales=args.scales,

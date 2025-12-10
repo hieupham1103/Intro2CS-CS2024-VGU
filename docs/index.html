@@ -15,6 +15,20 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Global ASCII Art Background -->
+    <div class="ascii-doodles-global">
+        <div class="ascii-art drone1">🛸</div>
+        <div class="ascii-art bird1">🐦</div>
+        <div class="ascii-art drone2">✈️</div>
+        <div class="ascii-art ufo1">👽</div>
+        <div class="ascii-art bird2">🕊️</div>
+        <div class="ascii-art drone3">🚁</div>
+        <div class="ascii-art satellite1">🛰️</div>
+        <div class="ascii-art rocket1">🚀</div>
+        <div class="ascii-art drone4">🛩️</div>
+        <div class="ascii-art bird3">🦅</div>
+    </div>
+    
     <!-- Navigation -->
     <nav>
         <div class="container">
@@ -37,10 +51,9 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <span class="badge"><i class="fas fa-trophy"></i> A Robust Real-time UAV Detection System</span>
-            <h1>A Robust Real-time UAV Detection System</h1>
+            <h1>Real-time UAV Detection System</h1>
             <p class="subtitle">
-                Multiscale Processing & Cross-Head Knowledge Distillation for detecting small UAVs in challenging environments using YOLOv8-based architecture.
+                Combining multiscale processing and cross-head knowledge distillation to detect small UAVs in challenging environments using a YOLOv8-based architecture.
             </p>
             <div class="hero-stats">
                 <div class="stat">
@@ -53,7 +66,7 @@
                 </div>
                 <div class="stat">
                     <div class="stat-value">+29%</div>
-                    <div class="stat-label">Improvement</div>
+                    <div class="stat-label">IMPROVEMENT</div>
                 </div>
             </div>
             <a href="https://github.com/hieupham1103/Intro2CS-CS2024-VGU" target="_blank" class="github-btn">
@@ -77,28 +90,19 @@
     <!-- Challenges Section -->
     <section id="challenges">
         <div class="section-header">
-            <h2>Core Technical Challenges</h2>
+            <h2>Technical Challenges</h2>
             <p>As commercial drones become more accessible, the risk of unauthorized surveillance and airspace intrusion increases.</p>
         </div>
         <div class="grid-3">
             <div class="card">
-                <div class="challenge-icon orange">
-                    <i class="fas fa-search-minus"></i>
-                </div>
                 <h3>Small Object Size</h3>
                 <p>Drones often occupy a tiny fraction of the frame (&lt;5%), and standard resizing in object detectors causes significant feature loss.</p>
             </div>
             <div class="card">
-                <div class="challenge-icon blue">
-                    <i class="fas fa-microchip"></i>
-                </div>
                 <h3>Computational Cost</h3>
                 <p>High-accuracy models (e.g., YOLOv8-X) are too heavy for edge devices, requiring the speed of 'Nano' models with the accuracy of 'Large' models.</p>
             </div>
             <div class="card">
-                <div class="challenge-icon purple">
-                    <i class="fas fa-cloud-sun"></i>
-                </div>
                 <h3>Domain Generalization</h3>
                 <p>The system must generalize across diverse environments including clear sky, fog, night, and various weather conditions.</p>
             </div>
@@ -113,7 +117,7 @@
         </div>
         <div class="methodology-content">
             <div class="method-card">
-                <h3><i class="fas fa-th-large"></i> Multiscale Processing</h3>
+                <h3>Multiscale Processing</h3>
                 <p>To resolve the small object issue, we implemented a grid cropping strategy during inference. Instead of resizing the entire large image down to the model input size (which destroys small details), we process the image in segments.</p>
                 
                 <h4>5-Crop Pattern</h4>
@@ -127,12 +131,12 @@
                 <p>Merging results using standard NMS proved too aggressive. We adopted Non-Maximum Weighted (NMW) to calculate weighted average of box coordinates based on confidence scores.</p>
 
                 <div class="highlight-box">
-                    <p><strong>Key Finding:</strong> Using only the 5 crops (discarding the full-frame original image) yielded the best F1-score and AP, as the original resized frame often introduced false positives.</p>
+                    <p><strong>Note:</strong> Using only the 5 crops (discarding the full-frame original image) yielded the best F1-score and AP, as the original resized frame often introduced false positives.</p>
                 </div>
             </div>
 
             <div class="method-card">
-                <h3><i class="fas fa-graduation-cap"></i> Knowledge Distillation</h3>
+                <h3>Knowledge Distillation</h3>
                 <p>To achieve low latency, we distilled knowledge from a heavy Teacher model to a lightweight Student model (YOLOv8-Nano) using Cross-Head Knowledge Distillation (CrossKD).</p>
 
                 <h4>Progressive Distillation</h4>
@@ -154,7 +158,7 @@
                 </ul>
 
                 <div class="highlight-box">
-                    <p><strong>Why CrossKD?</strong> By interacting directly at the head level, the model learns better bounding box regression and focuses on detection-sensitive features rather than background noise.</p>
+                    <p>By interacting directly at the head level, the model learns better bounding box regression and focuses on detection-sensitive features rather than background noise.</p>
                 </div>
             </div>
         </div>
@@ -274,7 +278,7 @@
         </div>
 
         <div class="card" style="max-width: 900px; margin: 0 auto;">
-            <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-chart-bar" style="color: var(--primary); margin-right: 0.5rem;"></i> Quantitative Results</h3>
+            <h3 style="margin-bottom: 1.5rem;">Quantitative Results</h3>
             <div class="results-table">
                 <table>
                     <thead>
@@ -334,15 +338,15 @@
 
             <h4 style="margin-top: 2rem; color: var(--secondary);">Multiscale Analysis</h4>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">
-                Experiments on the cropping strategy revealed that including the original full-frame image often degraded Precision (AP).
+                Experiments on the cropping strategy showed that including the original full-frame image often degraded precision.
             </p>
             <ul style="color: var(--text-secondary); margin-top: 1rem; padding-left: 1.5rem;">
                 <li><strong>Original + 4 Crops:</strong> Higher Recall, but lower Precision (more false positives)</li>
-                <li><strong>5 Crops Only:</strong> Best trade-off, achieving F1-score of <span class="metric-good">0.3323</span> vs baseline 0.2978</li>
+                <li><strong>5 Crops Only:</strong> Best trade-off, achieving F1-score of <span class="metric-good">0.3323</span> IMPROVEMENT 0.2978</li>
             </ul>
-            <h4 style="margin-top: 2rem; color: var(--secondary);">Knowledge Distillation</h4>
+            <h4 style="margin-top: 2rem; color: var(--secondary);">Knowledge Distillation Results</h4>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">
-                We distilled knowledge from YOLOv8-X to YOLOv8-Nano via YOLOv8-Large as an intermediate using Cross-Head Knowledge Distillation (CrossKD). This method significantly boosted mAP by +10% by focusing on detection-sensitive features and improving localization.
+                We distilled knowledge from YOLOv8-X to YOLOv8-Nano via YOLOv8-Large as an intermediate using Cross-Head Knowledge Distillation (CrossKD). This approach improved mAP by +10% by focusing on detection-sensitive features and improving localization.
             </p>
         </div>
     </section>
@@ -376,29 +380,20 @@
         <div class="conclusion">
             <h2>Conclusion</h2>
             <p>
-                This project successfully developed a UAV detection system that balances accuracy and speed. The <strong>Multiscale Processing</strong> strategy effectively handles small objects by simulating a zoom effect, while the <strong>Cross-Head Knowledge Distillation (CrossKD)</strong> combined with Progressive KD ensures efficient knowledge transfer with enhanced localization capabilities.
+                This project developed a UAV detection system that balances accuracy and speed. The multiscale processing strategy handles small objects by simulating a zoom effect, while the cross-head knowledge distillation combined with progressive KD enables efficient knowledge transfer with enhanced localization capabilities.
             </p>
             <div class="key-achievements">
                 <div class="achievement">
-                    <div class="achievement-icon">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
                     <h4>+29% Accuracy</h4>
                     <p>mAP improved from 0.55 to 0.84</p>
                 </div>
                 <div class="achievement">
-                    <div class="achievement-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h4>Real-time Speed</h4>
-                    <p>28 FPS suitable for edge deployment</p>
+                    <h4>Real-time Performance</h4>
+                    <p>28 FPS on edge devices</p>
                 </div>
                 <div class="achievement">
-                    <div class="achievement-icon">
-                        <i class="fas fa-crosshairs"></i>
-                    </div>
-                    <h4>Enhanced Localization</h4>
-                    <p>Better bounding box regression via CrossKD</p>
+                    <h4>Better Localization</h4>
+                    <p>Improved bounding box regression via CrossKD</p>
                 </div>
             </div>
         </div>
@@ -409,7 +404,7 @@
         <div class="references-container">
             <div class="section-header">
                 <h2>References</h2>
-                <p>Key research papers that informed our approach</p>
+                <p>Research papers that informed our approach</p>
             </div>
 
             <div class="reference-item">
