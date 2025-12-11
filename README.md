@@ -60,6 +60,21 @@ pip install -r requirements.txt
 - lap
 - tqdm
 
+### Download Pre-trained Checkpoints
+
+Download our trained model weights from Kaggle:
+
+```bash
+# Download from Kaggle
+# https://www.kaggle.com/models/hiuphmnhtrung/intro2cs-model
+```
+
+Or use Kaggle CLI:
+```bash
+kaggle models download hiuphmnhtrung/intro2cs-model
+unzip intro2cs-model.zip -d checkpoints/
+```
+
 
 ## How to Reproduce
 
