@@ -204,47 +204,77 @@ python train.py --set RGB \
 
 ### 2. Knowledge Distillation with CrossKD
 
-For Cross-Head Knowledge Distillation, we use the [CrossKD](https://github.com/jbwang1997/CrossKD) framework. The implementation is in the `CrossKD/` directory.
+We provide a YOLOv8-based implementation of Cross-Head Knowledge Distillation in the `CrossKD/` directory. This implementation supports multiple KD methods.
+
+**Supported KD Methods:**
+- **CrossKD** - Cross-Head Knowledge Distillation (CVPR 2024)
+- **FGD** - Focal and Global Knowledge Distillation (CVPR 2022)
+- **ReviewKD** - Distilling Knowledge via Knowledge Review (CVPR 2021)
+- **AFD** - Attention-based Feature-level Distillation (AAAI 2021)
+- **OST** - One-to-one Self-teaching (TGRS 2023)
 
 #### Setup CrossKD Environment
 
 ```bash
-# Create conda environment
-conda create --name crosskd python=3.8 -y
-conda activate crosskd
-
-# Install PyTorch
-conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
-
-# Install MMEngine and MMCV
-pip install -U openmim
-mim install "mmengine==0.7.3"
-mim install "mmcv==2.0.0rc4"
-
-# Install CrossKD
 cd CrossKD
-pip install -v -e .
+pip install -r requirements.txt
 ```
 
-#### Training with CrossKD
+#### Training with Knowledge Distillation
 
-**Single GPU:**
+Edit `main.py` or create your own training script:
+
+```python
+from ultralytics import YOLO
+
+# Define model
+model = YOLO('yolov8n.yaml')
+
+# Train with Knowledge Distillation
+model.train(
+    data='configs/data_RGB.yml',
+    epochs=100,
+    imgsz=640,
+    batch=16,
+    device=0,
+    # Knowledge Distillation Parameters
+    Mode='KD',                    # 'KD' for distillation, 'Training' for normal training
+    KD_Method='CrossKD',          # Options: 'AFD', 'ReviewKD', 'OST', 'CrossKD', 'FGD'
+    teacher='path/to/teacher.pt', # Path to pre-trained teacher model
+    alpha=0.01,                   # Weight for distillation loss
+)
+```
+
+**Training Arguments:**
+| Argument | Description |
+|----------|-------------|
+| `Mode` | `'KD'` for distillation, `'Training'` for normal training |
+| `KD_Method` | KD method: `'CrossKD'`, `'FGD'`, `'ReviewKD'`, `'AFD'`, `'OST'` |
+| `teacher` | Path to pre-trained teacher model checkpoint |
+| `alpha` | Weight for distillation loss (default: 0.01) |
+
+#### Progressive Distillation Pipeline
+
+For best results, use progressive distillation:
+
 ```bash
-python tools/train.py configs/crosskd/${CONFIG_FILE}
+# Step 1: Train Teacher (YOLOv8-X) on target dataset
+python main.py  # Configure for normal training with yolov8x.yaml
+
+# Step 2: Distill to Intermediate (YOLOv8-L)
+python main.py  # Configure KD with teacher=yolov8x.pt, student=yolov8l.yaml
+
+# Step 3: Distill to Student (YOLOv8-Nano)
+python main.py  # Configure KD with teacher=yolov8l.pt, student=yolov8n.yaml
 ```
 
-**Multi GPU:**
-```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash tools/dist_train.sh \
-    configs/crosskd/${CONFIG_FILE} 4
+#### Validation
+
+```python
+model.val(data="configs/data_RGB.yml", imgsz=640, batch=16, split='val')
 ```
 
-#### Evaluation
-```bash
-python tools/test.py configs/crosskd/${CONFIG_FILE} ${CHECKPOINT_FILE}
-```
-
-For detailed CrossKD documentation, see [CrossKD/README.md](CrossKD/README.md).
+For detailed documentation, see [CrossKD/README.md](CrossKD/README.md).
 
 
 ### 3. Evaluation
